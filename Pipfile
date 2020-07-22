@@ -8,6 +8,3 @@ pytest = "*"
 
 [packages]
 pyyaml = "*"
-
-[requires]
-python_version = "3.8"
