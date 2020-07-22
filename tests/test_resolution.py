@@ -8,7 +8,6 @@ To test the ConstantLoader._resolve_path function
 
 
 def test_existing_path(instance):
-    print(sample_data["widget"]["window"]["height"], instance._resolve_path("widget", "window", "height"))
     assert instance._resolve_path("widget", "window", "height") == sample_data["widget"]["window"]["height"]
     assert instance._resolve_path("widget") == sample_data["widget"]
 
