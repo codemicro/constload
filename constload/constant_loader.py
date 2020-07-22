@@ -49,7 +49,7 @@ class ConstantLoader:
             self.data = load_from
         else:
             # invalid type, cannot be used
-            raise TypeError(f"Type {type(load_from)} cannot be used")
+            raise TypeError("Type {} cannot be used".format(type(load_from)))
 
     def _resolve_path(self, *path, obj=None):
         """
