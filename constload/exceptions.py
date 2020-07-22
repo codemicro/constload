@@ -1,3 +1,5 @@
+# TODO: Add base exception
+
 class RequiredSettingNotFoundException(Exception):
     def __init__(self, param):
         self.msg = param
