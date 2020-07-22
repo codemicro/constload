@@ -8,9 +8,9 @@ except ImportError:
     from yaml import Loader as yaml_loader
 
 
-class ConstantLoader():
+class ConstantLoader:
 
-    def __init(self, load_from, safe_load_yaml=True):
+    def __init__(self, load_from, safe_load_yaml=True):
         if type(load_from) == str:
             # assume that the input is a file path and parse contents
 
@@ -33,7 +33,7 @@ class ConstantLoader():
                 # Not JSON. Test load YAML.
 
                 if safe_load_yaml:
-                    from_yaml = yaml.safe_load(file_contents, Loader=yaml_loader)
+                    from_yaml = yaml.safe_load(file_contents)
                 else:
                     from_yaml = yaml.load(file_contents, Loader=yaml_loader)
 
