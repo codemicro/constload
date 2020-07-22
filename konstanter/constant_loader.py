@@ -66,7 +66,7 @@ class ConstantLoader():
         if len(path) == 0:
             return self.data
         else:
-            return self.resolve_path(*path[1:], obj[path[0]])
+            return self._resolve_path(*path[1:], obj[path[0]])
 
     def pick_default(self, default_value, *path):
         # TODO: rename to something more meaningful?
