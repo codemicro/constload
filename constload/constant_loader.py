@@ -58,23 +58,24 @@ class ConstantLoader:
         :param path: list of JSON arguments, for example j["thing"][1]["hello"] would be ["thing", 1, "hello"]
         :param obj: used for recursion. Defaults to self.data
         :return: none if not found otherwise values
-        :raises: ValueError if the path is not found
+        :raises: KeyError if the path is not found
         """
         if obj is None:
             obj = self.data
 
         if len(path) == 0:
-            return self.data
+            return obj
         else:
-            return self._resolve_path(*path[1:], obj=[path[0]])
+            return self._resolve_path(*path[1:], obj=obj[path[0]])
 
     def pick_default(self, default_value, *path):
         # TODO: rename to something more meaningful?
         """
-        Determines if a default should be used depending on if the specified path can be found in the loaded_settings object
+        Determines if a default should be used depending on if the specified path can be found in the loaded_settings
+        object
 
         :param path: path to search
-        :param default: default value
+        :param default_value: default value to use
         :return: chosen value (default or loaded from specified path)
         """
 
