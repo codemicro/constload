@@ -5,8 +5,7 @@ import constload
 
 @pytest.fixture(scope="module")
 def instance():
-    k = constload.ConstantLoader(sample_data)
-    yield k
+    return constload.ConstantLoader(sample_data)
 
 
 sample_json_filepath = "tests/resources/sample.json"
