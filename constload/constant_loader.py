@@ -1,16 +1,17 @@
-import json
+from json.decoder import JSONDecodeError
 import os
-import yaml
 from .exceptions import *
-try:
-    from yaml import CLoader as yaml_loader
-except ImportError:
-    from yaml import Loader as yaml_loader
+from .loaders import Loaders
+
 
 
 class ConstantLoader:
 
-    def __init__(self, load_from, safe_load_yaml=True):
+    def __init__(self, load_from, **kwargs):
+
+        safe_load_yaml = kwargs.get("safe_load_yaml", True)
+        loader = kwargs.get("loader")
+
         if type(load_from) == str:
             # assume that the input is a file path and parse contents
 
@@ -20,29 +21,41 @@ class ConstantLoader:
             else:
                 file_contents = open(load_from).read()
 
-            from_json = None
-            from_yaml = None
+            if loader is None:
 
-            # Test load JSON
-            try:
-                from_json = json.loads(file_contents)
-            except json.decoder.JSONDecodeError:
-                pass
+                from_json = None
+                from_yaml = None
 
-            if from_json is None:
-                # Not JSON. Test load YAML.
+                # Test load JSON
+                try:
+                    from_json = Loaders.json(file_contents)
+                except JSONDecodeError:
+                    pass
 
-                if safe_load_yaml:
-                    from_yaml = yaml.safe_load(file_contents)
+                if from_json is None:
+                    # Not JSON. Test load YAML.
+
+                    if safe_load_yaml:
+                        from_yaml = Loaders.yaml_safe(file_contents)
+                    else:
+                        from_yaml = Loaders.yaml_unsafe(file_contents)
+
+                    if type(from_yaml) is dict:  # Data successfully parsed
+                        self.data = from_yaml
+                    else:
+                        raise ValueError("Provided string is not a filepath, valid JSON nor valid YAML.")
                 else:
-                    from_yaml = yaml.load(file_contents, Loader=yaml_loader)
+                    self.data = from_json
 
-                if type(from_yaml) is dict:  # Data successfully parsed
-                    self.data = from_yaml
-                else:
-                    raise ValueError("Provided string is not a filepath, valid JSON nor valid YAML.")
             else:
-                self.data = from_json
+                custom_loader_output = loader(file_contents)
+                if custom_loader_output is None:
+                    raise ValueError("Custom loader function returned no value")
+                if type(custom_loader_output) != dict:
+                    raise ValueError("Custom loader function returned incorrect type (must be dict,"
+                                     .format(type(custom_loader_output)))
+                else:
+                    self.data = custom_loader_output
 
         elif type(load_from) == dict:
             # preloaded JSON or YAML or whatever
@@ -96,4 +109,3 @@ class ConstantLoader:
             return self._resolve_path(*path)
         except LookupError:
             raise RequiredSettingNotFoundException(path)
-
