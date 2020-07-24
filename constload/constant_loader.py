@@ -66,7 +66,7 @@ class ConstantLoader:
             # invalid type, cannot be used
             raise TypeError("Type {} cannot be used".format(type(load_from)))
 
-    def _resolve_path(self, *path, obj=None):
+    def _resolve_path(self, path):
         """
         Get value of specified path in array/dict
 
@@ -75,38 +75,36 @@ class ConstantLoader:
         :return: none if not found otherwise values
         :raises: KeyError if the path is not found
         """
-        if obj is None:
-            obj = self.data
 
         if len(path) == 0:
-            return obj
+            return self.data
         else:
-            t = obj
+            t = self.data
             for i in range(len(path) - 1):
                 t = t[path[i]]
             return t[path[-1]]
 
-    def _write_path(self, value, *path, obj=None):
+    def _write_path(self, value, path):
         """
         Write value to path specified
 
         :param value: value to write
         :param path: path to write to
-        :param obj: object path is in
+        :param : object path is in
         """
 
-        if obj is None:
-            obj = self.data
-
         if len(path) == 0:
-            obj = value
+            if type(value) != dict:
+                raise TypeError("Writing value {} to path {} will cause the base value to not be a dictionary")
+            else:
+                self.data = value
         else:
-            t = obj
+            t = self.data
             for i in range(len(path)-1):
                 t = t[path[i]]
             t[path[-1]] = value
 
-    def default(self, default_value, *path):
+    def default(self, default_value, path):
         """
         Determines if a default should be used depending on if the specified path can be found in the loaded_settings
         object
@@ -117,12 +115,12 @@ class ConstantLoader:
         """
 
         try:
-            return self._resolve_path(*path)
+            return self._resolve_path(path)
         except LookupError:
             return default_value
 
 
-    def required(self, *path):
+    def required(self, path):
         """
         Raises if path cannot be resolved using resolve_path, otherwise returns the value
 
@@ -131,6 +129,6 @@ class ConstantLoader:
         """
 
         try:
-            return self._resolve_path(*path)
+            return self._resolve_path(path)
         except LookupError:
             raise RequiredSettingNotFoundException(path)
