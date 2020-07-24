@@ -3,7 +3,7 @@
 
 name: Publish package to TestPyPI
 on:
-  pull-request:
+  pull_request:
     branches: [ test-release ]
 
 jobs:
