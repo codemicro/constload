@@ -18,6 +18,11 @@ def test_from_string():
     assert k.data == sample_data
 
 
+def test_json_array():
+    with pytest.raises(TypeError):
+        constload.ConstantLoader("[1, 2, 3, 4]")
+
+
 def test_yaml_safe():
     k = constload.ConstantLoader(sample_yaml_filepath)
     assert k.data == sample_data

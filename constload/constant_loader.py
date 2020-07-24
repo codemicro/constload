@@ -45,6 +45,8 @@ class ConstantLoader:
                     else:
                         raise ValueError("Provided string is not a filepath, valid JSON nor valid YAML.")
                 else:
+                    if type(from_json) != dict:
+                        raise TypeError("Type {} cannot be used".format(type(from_json)))
                     self.data = from_json
 
             else:
@@ -66,7 +68,7 @@ class ConstantLoader:
 
     def _resolve_path(self, *path, obj=None):
         """
-        Recursively get value of specified path in array/dict
+        Get value of specified path in array/dict
 
         :param path: list of JSON arguments, for example j["thing"][1]["hello"] would be ["thing", 1, "hello"]
         :param obj: used for recursion. Defaults to self.data
@@ -79,10 +81,32 @@ class ConstantLoader:
         if len(path) == 0:
             return obj
         else:
-            return self._resolve_path(*path[1:], obj=obj[path[0]])
+            t = obj
+            for i in range(len(path) - 1):
+                t = t[path[i]]
+            return t[path[-1]]
 
-    def pick_default(self, default_value, *path):
-        # TODO: rename to something more meaningful?
+    def _write_path(self, value, *path, obj=None):
+        """
+        Write value to path specified
+
+        :param value: value to write
+        :param path: path to write to
+        :param obj: object path is in
+        """
+
+        if obj is None:
+            obj = self.data
+
+        if len(path) == 0:
+            obj = value
+        else:
+            t = obj
+            for i in range(len(path)-1):
+                t = t[path[i]]
+            t[path[-1]] = value
+
+    def default(self, default_value, *path):
         """
         Determines if a default should be used depending on if the specified path can be found in the loaded_settings
         object
@@ -97,7 +121,8 @@ class ConstantLoader:
         except LookupError:
             return default_value
 
-    def get_required_option(self, *path):
+
+    def required(self, *path):
         """
         Raises if path cannot be resolved using resolve_path, otherwise returns the value
 

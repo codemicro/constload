@@ -1,9 +1,16 @@
 import json as _json
-import yaml
+
+_yaml_avail = True
 try:
-    from yaml import CLoader as yaml_loader
+    import yaml
 except ImportError:
-    from yaml import Loader as yaml_loader
+    _yaml_avail = False
+
+if _yaml_avail:
+    try:
+        from yaml import CLoader as yaml_loader
+    except ImportError:
+        from yaml import Loader as yaml_loader
 
 
 class Loaders:
@@ -13,8 +20,16 @@ class Loaders:
 
     @classmethod
     def yaml_safe(_, data):
-        return yaml.safe_load(data)
+        if _yaml_avail:
+            return yaml.safe_load(data)
+        else:
+            raise RuntimeError("PyYAML is not installed. Install it with either 'pip install constload[yaml]' or "
+                               "'pip install PyYAML'")
 
     @classmethod
     def yaml_unsafe(_, data):
-        return yaml.load(data, Loader=yaml_loader)
+        if _yaml_avail:
+            return yaml.load(data, Loader=yaml_loader)
+        else:
+            raise RuntimeError("PyYAML is not installed. Install it with either 'pip install constload[yaml]' or "
+                               "'pip install PyYAML'")
