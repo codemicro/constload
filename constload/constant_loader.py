@@ -2,7 +2,7 @@ from json.decoder import JSONDecodeError
 import os
 from .exceptions import *
 from .loaders import Loaders
-
+from copy import deepcopy
 
 
 class ConstantLoader:
@@ -61,7 +61,7 @@ class ConstantLoader:
 
         elif type(load_from) == dict:
             # preloaded JSON or YAML or whatever
-            self.data = load_from
+            self.data = deepcopy(load_from)
         else:
             # invalid type, cannot be used
             raise TypeError("Type {} cannot be used".format(type(load_from)))
@@ -101,10 +101,14 @@ class ConstantLoader:
         else:
             t = self.data
             for i in range(len(path)-1):
-                t = t[path[i]]
+                try:
+                    t = t[path[i]]
+                except KeyError:
+                    t[path[i]] = {}
+                    t = t[path[i]]
             t[path[-1]] = value
 
-    def default(self, default_value, path):
+    def default(self, path, default_value=None):
         """
         Determines if a default should be used depending on if the specified path can be found in the loaded_settings
         object
@@ -117,6 +121,7 @@ class ConstantLoader:
         try:
             return self._resolve_path(path)
         except LookupError:
+            self._write_path(default_value, path)
             return default_value
 
 
