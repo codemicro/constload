@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="constload",
-    version="1.0.0",
+    version="1.0.1",
     author="Thomas Pain",
     author_email="tom@tdpain.net",
     description="A package to streamline constant loading and initialisation",
