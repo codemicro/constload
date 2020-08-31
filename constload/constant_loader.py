@@ -100,7 +100,7 @@ class ConstantLoader:
                 self.data = value
         else:
             t = self.data
-            for i in range(len(path)-1):
+            for i in range(len(path) - 1):
                 try:
                     t = t[path[i]]
                 except KeyError:
@@ -118,12 +118,14 @@ class ConstantLoader:
         :return: chosen value (default or loaded from specified path)
         """
 
+        if type(path) == str:
+            path = (path,)
+
         try:
             return self._resolve_path(path)
         except LookupError:
             self._write_path(default_value, path)
             return default_value
-
 
     def required(self, path):
         """
@@ -132,6 +134,9 @@ class ConstantLoader:
         :param path: path to search for
         :return: value from loaded_settings
         """
+
+        if type(path) == str:
+            path = (path,)
 
         try:
             return self._resolve_path(path)
